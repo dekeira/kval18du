@@ -1,0 +1,169 @@
+CREATE DATABASE real_estate_agency;
+USE real_estate_agency;
+
+CREATE TABLE Roles (
+    role_id INT PRIMARY KEY AUTO_INCREMENT,
+    role_name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(100) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role_id INT,
+    contact_info TEXT,
+    FOREIGN KEY (role_id) REFERENCES Roles(role_id)
+);
+
+CREATE TABLE Properties (
+    property_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2),
+    type VARCHAR(50),
+    area DECIMAL(8,2),
+    address VARCHAR(300),
+    status VARCHAR(50)
+);
+
+CREATE TABLE Clients (
+    client_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    phone VARCHAR(20),
+    preferences TEXT,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Requests (
+    request_id INT PRIMARY KEY AUTO_INCREMENT,
+    client_id INT,
+    agent_id INT,
+    request_date DATE,
+    total_commission DECIMAL(10,2),
+    status VARCHAR(50),
+    FOREIGN KEY (client_id) REFERENCES Clients(client_id),
+    FOREIGN KEY (agent_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE RequestProperties (
+    req_prop_id INT PRIMARY KEY AUTO_INCREMENT,
+    request_id INT,
+    property_id INT,
+    notes TEXT,
+    FOREIGN KEY (request_id) REFERENCES Requests(request_id),
+    FOREIGN KEY (property_id) REFERENCES Properties(property_id)
+);
+
+CREATE TABLE Deals (
+    deal_id INT PRIMARY KEY AUTO_INCREMENT,
+    request_id INT,
+    deal_date DATE,
+    amount DECIMAL(10,2),
+    deal_type VARCHAR(50),
+    FOREIGN KEY (request_id) REFERENCES Requests(request_id)
+);
+
+CREATE TABLE Reviews (
+    review_id INT PRIMARY KEY AUTO_INCREMENT,
+    client_id INT,
+    property_id INT,
+    rating INT,
+    comment TEXT,
+    review_date DATE,
+    FOREIGN KEY (client_id) REFERENCES Clients(client_id),
+    FOREIGN KEY (property_id) REFERENCES Properties(property_id)
+);
+
+CREATE TABLE PropertyPhotos (
+    photo_id INT PRIMARY KEY AUTO_INCREMENT,
+    property_id INT,
+    image_path VARCHAR(300),
+    FOREIGN KEY (property_id) REFERENCES Properties(property_id)
+);
+
+-- Заполнение Roles
+INSERT INTO Roles (role_name) VALUES ('Гость'), ('Клиент'), ('Агент'), ('Менеджер'), ('Администратор');
+
+-- Заполнение Properties
+INSERT INTO Properties (name, description, price, type, area, address, status) VALUES
+('Двухкомнатная квартира в центре', 'Светлая квартира с ремонтом, рядом метро', 8500000.00, 'квартира', 54.5, 'г. Москва, ул. Ленина, д. 15, кв. 42', 'продажа'),
+('Трехкомнатная квартира у парка', 'Просторная квартира с видом на парк', 12000000.00, 'квартира', 78.3, 'г. Москва, Парковая ул., д. 8, кв. 15', 'продажа'),
+('Студия в новом ЖК', 'Современная студия с отделкой', 4500000.00, 'студия', 28.0, 'г. Москва, пр. Мира, д. 120, кв. 305', 'продажа'),
+('Четырехкомнатная квартира', 'Элитная квартира с панорамными окнами', 18500000.00, 'квартира', 110.5, 'г. Москва, наб. реки, д. 3, кв. 88', 'продажа'),
+('Однокомнатная квартира', 'Уютная квартира для молодой семьи', 6200000.00, 'квартира', 38.2, 'г. Москва, ул. Гагарина, д. 45, кв. 12', 'продажа'),
+('Коттедж 200 кв.м', 'Загородный дом с участком 10 соток', 15000000.00, 'дом', 200.0, 'МО, г. Одинцово, д. Жуковка, ул. Лесная, д. 7', 'продажа'),
+('Таунхаус в поселке', 'Современный таунхаус с гаражом', 9800000.00, 'таунхаус', 145.0, 'МО, г. Красногорск, КП Зеленый, д. 23', 'продажа'),
+('Офисное помещение 150 кв.м', 'Помещение свободного назначения, 1 этаж', 25000000.00, 'коммерция', 150.0, 'г. Москва, деловой центр, ул. Бизнес, д. 1', 'продажа'),
+('Гараж в центре', 'Отдельностоящий гараж с ямой', 850000.00, 'гараж', 24.0, 'г. Москва, ГСК Центральный, бокс 45', 'продажа'),
+('Земельный участок 15 соток', 'Участок ИЖС, все коммуникации', 3500000.00, 'участок', 15.0, 'МО, г. Подольск, д. Иваново, ул. Полевая', 'продажа'),
+('Двухкомнатная квартира', 'Квартира с хорошим ремонтом', 7800000.00, 'квартира', 52.0, 'г. Москва, ул. Академика, д. 22, кв. 67', 'аренда'),
+('Студия посуточно', 'Уютная студия рядом с метро', 3500.00, 'студия', 25.0, 'г. Москва, ул. Вокзальная, д. 5, кв. 18', 'аренда'),
+('Трехкомнатная квартира', 'Длительная аренда, с мебелью', 85000.00, 'квартира', 72.0, 'г. Москва, пр. Вернадского, д. 88, кв. 142', 'аренда'),
+('Лофт студия', 'Творческое пространство в центре', 55000.00, 'студия', 45.0, 'г. Москва, арт-квартал, ул. Творческая, д. 3', 'аренда'),
+('Офис 50 кв.м', 'Небольшой офис для стартапа', 45000.00, 'коммерция', 50.0, 'г. Москва, БЦ Новый, офис 305', 'аренда');
+
+-- Заполнение PropertyPhotos
+INSERT INTO PropertyPhotos (property_id, image_path) VALUES
+(1, 'images/1.png'),
+(2, 'images/1.png'), 
+(3, 'images/1.png'),
+(4, 'images/1.png'),
+(5, 'images/2.png'),
+(6, 'images/2.png'),
+(7, 'images/2.png'),
+(8, 'images/2.png'),
+(9, 'images/2.png'),
+(10, 'images/2.png'),
+(11, 'images/3.png'),
+(12, 'images/3.png'),
+(13, 'images/3.png'),
+(14, 'images/3.png'),
+(15, 'images/3.png');
+
+-- Заполнение Users
+INSERT INTO Users (username, password_hash, role_id, contact_info) VALUES
+('guest_user', 'guest123', 1, 'guest@email.com'),
+('ivanov', 'pass123', 2, 'ivanov@mail.ru, +7(916)123-45-67'),
+('petrova', 'pass456', 2, 'petrova@gmail.com, +7(926)234-56-78'),
+('sidorov', 'pass789', 2, 'sidorov@yandex.ru, +7(903)345-67-89'),
+('agent_smith', 'agent123', 3, 'smith@realestate.ru, +7(495)111-22-33'),
+('agent_jones', 'agent456', 3, 'jones@realestate.ru, +7(495)222-33-44'),
+('agent_brown', 'agent789', 3, 'brown@realestate.ru, +7(495)333-44-55'),
+('manager_white', 'manager123', 4, 'white@realestate.ru, +7(495)444-55-66'),
+('manager_black', 'manager456', 4, 'black@realestate.ru, +7(495)555-66-77'),
+('admin', 'admin123', 5, 'admin@realestate.ru, +7(495)000-00-01');
+
+-- Заполнение Clients
+INSERT INTO Clients (user_id, phone, preferences) VALUES
+(2, '+7(916)123-45-67', 'Двух-трехкомнатные квартиры до 10 млн'),
+(3, '+7(926)234-56-78', 'Студии и однушки near метро'),
+(4, '+7(903)345-67-89', 'Загородная недвижимость, дома');
+
+-- Заполнение Requests
+INSERT INTO Requests (client_id, agent_id, request_date, total_commission, status) VALUES
+(1, 5, '2025-01-15', 85000.00, 'Ожидает обработки'),
+(1, 6, '2025-01-18', 120000.00, 'Запланирован просмотр'),
+(2, 5, '2025-01-20', 45000.00, 'Ожидает просмотра'),
+(3, 7, '2025-01-22', 150000.00, 'Закрыта'),
+(2, 6, '2025-01-25', 62000.00, 'Ожидает обработки');
+
+-- Заполнение RequestProperties
+INSERT INTO RequestProperties (request_id, property_id, notes) VALUES
+(1, 1, 'Клиенту понравилась квартира, хочет посмотреть'),
+(1, 2, 'Альтернативный вариант'),
+(2, 5, 'Просмотр назначен на 25 января'),
+(3, 11, 'Аренда студии на месяц'),
+(4, 6, 'Клиент купил коттедж'),
+(4, 7, 'Рассматривал также таунхаус'),
+(5, 3, 'Новая заявка на студию');
+
+-- Заполнение Deals
+INSERT INTO Deals (request_id, deal_date, amount, deal_type) VALUES
+(4, '2025-01-23', 15000000.00, 'продажа'),
+(1, '2025-01-26', 8500000.00, 'продажа');
+
+-- Заполнение Reviews
+INSERT INTO Reviews (client_id, property_id, rating, comment, review_date) VALUES
+(1, 1, 5, 'Отличная квартира, всё понравилось!', '2025-01-20'),
+(2, 11, 4, 'Хорошая студия, но шумновато', '2025-01-22'),
+(3, 6, 5, 'Прекрасный дом, отличные агенты!', '2025-01-24');
